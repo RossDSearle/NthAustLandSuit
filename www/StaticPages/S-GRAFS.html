@@ -1,0 +1,339 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>S-GRAFS</title>
+  <meta content="Ross Searle" name="author">
+</head>
+<body>
+<p class="MsoNormal"><b><span lang="EN-GB">TERN Subcontract Landscape
+Assessment, ANU
+2018-19<o:p></o:p></span></b></p>
+<p class="MsoNormal"><b><span lang="EN-GB"><o:p>&nbsp;</o:p></span></b></p>
+<p class="MsoTitle"><span lang="EN-GB">S-GRAFS: Satellite-Guided
+Root-zone Analysis
+and Forecasting System<o:p></o:p></span></p>
+<p class="MsoNormal"><b><span lang="EN-GB"><o:p>&nbsp;</o:p></span></b></p>
+<p class="MsoNormal"><span lang="EN-GB">Luigi Renzullo and Siyuan Tian,
+ANU<o:p></o:p></span></p>
+<h1><span lang="EN-GB">Summary<o:p></o:p></span></h1>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB">The overall project objective
+was to
+develop a method and explore key data sources required to produce
+Australia-wide estimates of top-layer (0-5 cm) and root-zone (0-1 m)
+soil
+wetness at 1-km in near real-time (&lt; day latency).<span style="">&nbsp;
+</span>We adopted a &#8216;data-heavy, model-lite&#8217;
+approach where greater emphasis is placed on observations to capture
+the
+dynamics of soil water than any particular land surface or hydrology
+model. To
+this end we employed a simple autoregressive time series model to
+represent
+soil wetness dynamics in the top-soil layer with satellite-derived
+rainfall as
+the forcing data. Assimilation of satellite soil moisture data was used
+to
+correct modelled estimates of top-layer moisture, which were then
+extended to
+the root-zone estimates via a temporal smoothing filter.<span style="">&nbsp;
+</span>Finally, we trialled a temporal regression
+between the coarse ~10-km model resolution and finer-scale satellite
+radar data
+as an approach to downscale the model product to 1-km. Given the focus
+on
+satellite data to drive and constrain estimation, we have named the
+production
+system <i>Satellite-Guided Root-zone Analysis and Forecasting Systems</i>
+(S-GRAFS).<o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<h1><span lang="EN-GB">Satellite data<o:p></o:p></span></h1>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB">Three sources of satellite
+observations are
+considered in this investigation.<span style="">&nbsp; </span>The
+first are the near real-time multi-satellite rainfall analyses from the
+Global
+Precipitation Mission (GPM) IMERG system; second are the near real-time
+passive
+microwave retrievals of top-layer (0-5 cm) soil moisture from the Level
+2 Soil
+Moisture Active/Passive (SMAP) production systems; and finally the
+gamma-0
+backscattered C-band microwave reflectivities from the radar aboard the
+Sentinel-1 satellite.<o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB">Daily composites are
+constructed of the
+satellite rainfall and soil moisture data at their nominal 10-km
+resolution.
+These data are the main inputs to S-GRAFS for Australia-wide top-layer
+and root-zone
+soil moisture estimation. Owing to computational resource limitations
+we were
+only able to trial a downscaling method to 1-km using Sentinel-1 radar
+data for
+a small part of the continent.<o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<h1><span lang="EN-GB">Modelling and Assimilation<o:p></o:p></span></h1>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB">A simple approach to modelling
+the temporal
+dynamic of soil moisture in the vertical soil profile is to represent
+the
+process as a lag-1 autoregressive (AR-1) time series.<span style="">&nbsp;
+</span>A popular implementation of the AR-1 approach
+is known the antecedent precipitation index (API). The API models the
+wetness
+in the top soil layer for today as a fraction (&lt;1) of yesterday&#8217;s
+soil
+wetness plus today&#8217;s GPM rainfall forcing.<span style="">&nbsp;
+</span>The &#8216;fraction&#8217; of previous day&#8217;s wetness represents the total
+losses of
+water in the volume of soil that result from drainage, root water
+uptake,
+evaporation and lateral transport.<span style="">&nbsp; </span>For
+simplicity the implementation of API in S-GRAFS uses a time varying
+&#8216;fraction&#8217;
+based on the variation of climatologically derived average daily air
+temperature for the given day of year from the 30-year mean air
+temperature.<span style="">&nbsp; </span>These temperature data were
+those from AWAP system.<o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB">Recognising that API model is
+an overly
+simplistic representation of top-soil wetness dynamics, we employ
+assimilate
+SMAP soil moisture to compensate for model deficiencies. A 3-day
+assimilation
+window is employed to ensure a temporal smoothness in the analysed
+(i.e. best
+guess) top-layer soil wetness and minimise the visibility of the
+satellite
+track in the resulting nation-wide gridded product.<o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB">The exponential filter was
+developed as a
+way of extending to satellite observations of moisture in the top few
+cm&#8217;s of
+soil (0-2 cm or 0-5 cm) to deeper in the soil profile (Wagner et al,
+1999). It
+basically acts as a temporal smoother to produce a soil water index
+(SWI) that mimics
+the comparatively slower moisture dynamics observable in deeper soil
+profile
+than that of the surface layer.<span style="">&nbsp; </span>We have
+used the exponential filter in S-GRAFS to propagate the constraint of
+the analysed
+top-layer soil wetness into the deeper soil profile. The smoothing
+parameter of
+the filter was judiciously chosen that the SWI estimates provided
+maximum temporal
+correlation with 0-1 m average moisture measured at OzFlux sites around
+Australia. As such, we suggest that S-GRAFS implementation of the
+exponential
+filter provide root-zone SWI in the 0-1 m.<span style="">&nbsp;
+</span>Example of the SMAP daily soil moisture and the S-GRAFS estimate
+of
+top-layer and root-zone soil wetness is given in Figure 1.<o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB">Both top-layer and root-zone
+soil wetness
+estimate are produced for Australia on daily time step at ~10-km
+resolution
+(Fig 1.). We explored a potential downscaling approach using 1-km
+composites of
+Sentinel-1 gamma-0 data. These gamma-0 values from individual passes
+are
+processed from the original Sentinel-1 backscatter reflectivities using
+the <i>SentieNt
+Application Platform</i> (SNAP).<span style="">&nbsp; </span>However
+due to the heavy demand of the software for computing resources, we
+were only
+able to trial the approach across the Murrumbidgee.<o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB">The downscaling idea is the
+within each 10-km
+S-GRAFS cell is 100 1-km Sentinet-1 gamma-0 values. The time series of
+gamma-0
+from April 2015 to December 2018 is used to derive the well-established
+linear
+relationship between soil wetness and gamma-0. In our case, the soil
+wetness
+values are the oversampled 10-km grid values.<span style="">&nbsp;
+</span>The fitted linear equations are then used to downscale the 10-km
+gridded
+top-layer moisture to 1-km. Figure 2 shows an example of output from
+the
+downscaling using Sentinet-1 gamma-0 for 29 Feb 2016.<o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"
+ style="text-align: center; page-break-after: avoid;" align="center"><span
+ style="" lang="EN-GB"><!--[if gte vml 1]><v:shapetype id="_x0000_t75"
+ coordsize="21600,21600" o:spt="75" o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe"
+ filled="f" stroked="f">
+ <v:stroke joinstyle="miter"/>
+ <v:formulas>
+  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+  <v:f eqn="sum @0 1 0"/>
+  <v:f eqn="sum 0 0 @1"/>
+  <v:f eqn="prod @2 1 2"/>
+  <v:f eqn="prod @3 21600 pixelWidth"/>
+  <v:f eqn="prod @3 21600 pixelHeight"/>
+  <v:f eqn="sum @0 0 1"/>
+  <v:f eqn="prod @6 1 2"/>
+  <v:f eqn="prod @7 21600 pixelWidth"/>
+  <v:f eqn="sum @8 21600 0"/>
+  <v:f eqn="prod @7 21600 pixelHeight"/>
+  <v:f eqn="sum @10 21600 0"/>
+ </v:formulas>
+ <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+ <o:lock v:ext="edit" aspectratio="t"/>
+</v:shapetype><v:shape id="Picture_x0020_1" o:spid="_x0000_i1026" type="#_x0000_t75"
+ style='width:365.25pt;height:393pt;visibility:visible;mso-wrap-style:square'>
+ <v:imagedata src="file:///C:/Users/sea084/AppData/Local/Temp/msohtmlclip1/01/clip_image001.emz"
+  o:title=""/>
+</v:shape><![endif]--><!--[if !vml]--><img
+ src="file:///C:/Users/sea084/AppData/Local/Temp/msohtmlclip1/01/clip_image002.png"
+ v:shapes="Picture_x0020_1" height="524" width="487"><!--[endif]--></span><span
+ lang="EN-GB"><o:p></o:p></span></p>
+<p class="MsoCaption"><b><span style="font-style: normal;" lang="EN-GB">Figure
+</span></b><!--[if supportFields]><b><span
+lang=EN-GB style='font-style:normal'><span style='mso-element:field-begin'></span><span
+style='mso-spacerun:yes'> </span>SEQ Figure \* ARABIC <span style='mso-element:
+field-separator'></span></span></b><![endif]--><b><span
+ style="font-style: normal;" lang="EN-GB"><span style="">1</span></span></b><!--[if supportFields]><b><span
+lang=EN-GB style='font-style:normal'><span style='mso-element:field-end'></span></span></b><![endif]--><b><span
+ style="font-style: normal;" lang="EN-GB">.</span></b><span
+ style="font-style: normal;" lang="EN-GB"><span style="">&nbsp; </span>Example
+of
+S-GRAFS products for 25 Feb 2019:<span style="">&nbsp; </span>(a)
+daily composite of SMAP soil moisture retrieval (m3 m<sup>-3</sup>);
+analysed
+top-layer (0-5 cm) soil wetness index; and (c) root-zone (0-1 m) soil
+wetness
+index. <o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal" style="page-break-after: avoid;"><span style=""
+ lang="EN-GB"><!--[if gte vml 1]><v:shape id="Picture_x0020_2"
+ o:spid="_x0000_i1025" type="#_x0000_t75" style='width:416.25pt;height:147.75pt;
+ visibility:visible;mso-wrap-style:square'>
+ <v:imagedata src="file:///C:/Users/sea084/AppData/Local/Temp/msohtmlclip1/01/clip_image003.png"
+  o:title=""/>
+</v:shape><![endif]--><!--[if !vml]--><img
+ src="file:///C:/Users/sea084/AppData/Local/Temp/msohtmlclip1/01/clip_image004.png"
+ v:shapes="Picture_x0020_2" height="197" width="555"><!--[endif]--></span><span
+ lang="EN-GB"><o:p></o:p></span></p>
+<p class="MsoCaption"><b><span style="font-style: normal;" lang="EN-GB">Figure
+</span></b><!--[if supportFields]><b><span
+lang=EN-GB style='font-style:normal'><span style='mso-element:field-begin'></span><span
+style='mso-spacerun:yes'> </span>SEQ Figure \* ARABIC <span style='mso-element:
+field-separator'></span></span></b><![endif]--><b><span
+ style="font-style: normal;" lang="EN-GB"><span style="">2</span></span></b><!--[if supportFields]><b><span
+lang=EN-GB style='font-style:normal'><span style='mso-element:field-end'></span></span></b><![endif]--><b><span
+ style="font-style: normal;" lang="EN-GB">.</span></b><span
+ style="font-style: normal;" lang="EN-GB"><span style="">&nbsp; </span>Top-layer
+soil wetness index across the Murrumbidgee from S-GRAFS for 29 Feb
+2016: (a)
+1-km resolution estimates from the time series downscaling approach
+using
+Sentinel-1 radar backscatter data; and<span style="">&nbsp;
+</span>(b) 10-km estimates for the same date.<o:p></o:p></span></p>
+<h1><span lang="EN-GB">S-GRAFS Outputs<o:p></o:p></span></h1>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p style="text-align: left;" class="MsoNormal"><span lang="EN-GB">S-GRAFS
+runs operationally on National
+Computational Infrastructure (NCI) to produce daily Australia-wide
+estimates in
+near real-time (~20 hour latency).<span style="">&nbsp; </span>The
+generated ouputs are available through THREDDS:<o:p></o:p></span></p>
+<p style="text-align: left;" class="MsoNormal"><span lang="EN-GB"><a
+ href="http://dapds00.nci.org.au/thredds/catalog/ub8/au/S-GRAFS/catalog.html"><span
+ style="" lang="EN-AU">http://dapds00.nci.org.au/thredds/catalog/ub8/au/S-GRAFS/catalog.html</span></a></span><span
+ style=""><o:p></o:p></span></p>
+<div></div>
+<p style="text-align: center;" class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<div style="text-align: center;"></div>
+<p style="text-align: left;" class="MsoNormal"><span lang="EN-GB">Examples
+of the levels of product are given
+below.<o:p></o:p></span></p>
+<div style="text-align: center;"></div>
+<p style="text-align: center;" class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<div style="text-align: center;"></div>
+<p style="text-align: left;" class="MsoNormal"><span lang="EN-GB">Top-layer
+soil wetness forecast (i.e.
+initial guess before SMAP soil moisture assimilation):<o:p></o:p></span></p>
+<div style="text-align: center;"></div>
+<p style="text-align: left;" class="MsoNormal"><b><span
+ style="color: rgb(68, 114, 196);">S-GRAFS/Surface_Wetness_from_API_forecast_window_Australia_2019.nc<o:p></o:p></span></b></p>
+<div style="text-align: center;"></div>
+<p style="text-align: center;" class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<div style="text-align: center;"></div>
+<p style="text-align: left;" class="MsoNormal"><span lang="EN-GB">Top-layer
+soil wetness analysis (i.e.
+estimate after SMAP soil moisture assimilation):<o:p></o:p></span></p>
+<div style="text-align: center;"></div>
+<p style="text-align: left;" class="MsoNormal"><b><span
+ style="color: rgb(68, 114, 196);">S-GRAFS/Surface_Wetness_from_API_analysis_window_Australia_2019.nc</span></b><span
+ lang="EN-GB"><o:p></o:p></span></p>
+<div style="text-align: center;"></div>
+<p style="text-align: left;" class="MsoNormal"><span lang="EN-GB">Root-zone
+soil water index:<o:p></o:p></span></p>
+<div style="text-align: center;"></div>
+<p style="text-align: left;" class="MsoNormal"><b><span
+ style="color: rgb(68, 114, 196);">S-GRAFS/SWI_1m_forecast_window_Australia_2019.nc<o:p></o:p></span></b></p>
+<div style="text-align: center;"></div>
+<p style="text-align: center;" class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<div style="text-align: center;"></div>
+<p style="text-align: left;" class="MsoNormal"><span lang="EN-GB">Murrumbidgee
+sample of 1-km downscaled soil
+wetness:<o:p></o:p></span></p>
+<div style="text-align: center;"></div>
+<p style="text-align: left;" class="MsoNormal"><b><span
+ style="color: rgb(68, 114, 196);">S-GRAFS/downscaled_1km_surface_wetness_2018.nc<o:p></o:p></span></b></p>
+<div style="text-align: center;"></div>
+<h1 style="text-align: center;"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></h1>
+<h1><span lang="EN-GB">Next steps<o:p></o:p></span></h1>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB">The focus of on going work will
+be the <b>extension
+and further testing of the downscaling approach using the Sentinel-1
+gamma-0
+data</b>. <o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB">However, it is estimated from
+the this
+study to generate an Australia-wide gamma-0 time series at 1-km will
+consume
+300 KSU on NCI raijin <span style="">&nbsp;</span>if SNAP is used.
+Exploration of alternative methods is recommended, e.g. CSIRO
+Sentinel-1 radar
+processing software from Dr Catherine Ticehurst which may be a
+computationally
+cheaper. Furthermore, there may be plans to generate Australia-wide
+gamma-0 as
+an analysis ready product via Geoscience Australia, in which case we
+would be
+the very happy recipients of the undertaking (to be investigated). <o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB">After having applied the
+downscaling to
+S-GRAFS top-layer soil wetness estimates continentally, the next step
+would be
+to <b>apply the exponential filter to the downscaled data to generate
+estimates
+of 1-km root-zone soil wetness index.<o:p></o:p></b></span></p>
+<p class="MsoNormal"><b><span lang="EN-GB"><o:p>&nbsp;</o:p></span></b></p>
+<p class="MsoNormal"><span lang="EN-GB">Finally, and most importantly,
+an <b>extensive
+evaluation of S-GRAFS against the OzNet, OzFlux and CosmOz networks</b>
+alongside peer models (e.g. AWRA, JASMIN) is highly recommended to gain
+user acceptance.
+<o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="EN-GB"><o:p>&nbsp;</o:p></span></p>
+</body>
+</html>
