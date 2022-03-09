@@ -1,8 +1,8 @@
 ### Hopefully all the relevant parameters for the App are stored in here
 
 
-defaultRegion = 'Roper'
-defaultProductType = 'Suitability'
+defaultRegion = 'Victoria'
+defaultProductType = 'Attributes'
 defaultProjection = '+init=epsg:4326'
 
 
